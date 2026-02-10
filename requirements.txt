@@ -2,7 +2,7 @@ fastapi
 langchain
 langchain-text-splitters
 pymilvus
-torch==2.10.0+cpu
+torch==2.10.0
 transformers
 sentence-transformers
 datasets
