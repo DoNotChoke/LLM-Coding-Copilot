@@ -124,6 +124,7 @@ def main():
     connections.connect(alias="default", host=args.milvus_host, port=args.milvus_port)
 
     col = ensure_collection(args.collection, dim=args.embed_dim, metric=args.metric)
+    col.load()
     embedder = Embedder(dim=args.embed_dim, model_path=args.embed_model, normalize=True)
 
     targets = None
