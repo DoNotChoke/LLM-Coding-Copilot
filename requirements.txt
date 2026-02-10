@@ -1,0 +1,9 @@
+fastapi
+langchain
+langchain-text-splitters
+pymilvus
+torch
+transformers
+sentence-transformers
+datasets
+uvicorn
