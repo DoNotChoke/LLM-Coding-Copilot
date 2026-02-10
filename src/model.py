@@ -9,6 +9,10 @@ import torch
 
 from typing import List, Optional
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 torch.backends.cuda.enable_mem_efficient_sdp(False)
 torch.backends.cuda.enable_flash_sdp(False)
 
@@ -87,6 +91,29 @@ def build_fim_prompt(prefix: str, suffix: str) -> str:
     prefix = prefix or ""
     suffix = suffix or ""
     return f"{FIM_PREFIX}{prefix}{FIM_SUFFIX}{suffix}{FIM_MIDDLE}"
+
+
+def build_rag_context_block(hits: List[dict], language: str = "python") -> str:
+    if not hits:
+        return ""
+    
+    items = []
+    for h in hits:
+        text = (h.get("text") or "").strip()
+        if not text:
+            continue
+        items.append(text)
+    
+    body = "\n\n".join(items).strip()
+    if not body:
+        return ""
+
+    return (
+            '"""\n'
+            "RAG_CONTEXT (internal codebase; for reference only)\n"
+            f"{body}\n"
+            '"""\n\n'
+        )
 
 
 def strip_at_stop_strings(text: str, stop_strings: List[str]) -> str:

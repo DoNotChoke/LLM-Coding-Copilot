@@ -1,38 +1,23 @@
 {
-  "name": "llm-coding-copilot",
-  "displayName": "llm_coding_copilot",
-  "description": "VSCode extension for code suggestions inline.",
+  "name": "llm-coding-agent",
+  "displayName": "llm-coding-agent",
+  "description": "VSCode extension for code inline suggestions.",
   "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.108.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": ["onCommand:editor.action.inlineSuggest.trigger"],
+  "engines": { "vscode": "^1.109.0" },
+  "categories": ["Other"],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "llm-coding-copilot.helloWorld",
-      "title": "Hello World"
-    }],
-    "keybindings": [{
-      "key": "Alt+s",
-      "command": "editor.action.inlineSuggest.trigger",
-      "mac": "Alt+s"
-    }]
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.109.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "eslint": "^9.39.2",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "commands": [
+      { "command": "llm-coding-agent.helloWorld", "title": "Hello World" },
+      { "command": "llm-coding-agent.inlineSuggest", "title": "LLM: Inline Suggest" }
+    ],
+    "keybindings": [
+      {
+        "key": "alt+s",
+        "command": "llm-coding-agent.inlineSuggest",
+        "when": "editorTextFocus",
+        "mac": "alt+s"
+      }
+    ]
   }
 }

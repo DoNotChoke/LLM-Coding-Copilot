@@ -1,8 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch
+torchvision
+torchaudio
+
 fastapi
 langchain
 langchain-text-splitters
 pymilvus
-torch==2.10.0
 transformers
 sentence-transformers
 datasets

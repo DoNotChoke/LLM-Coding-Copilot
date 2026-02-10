@@ -9,6 +9,7 @@ from chunking import split_code_file
 from embedding import Embedder
 from milvus import ensure_collection, delete_file_chunks, upsert_chunks
 
+
 DEFAULT_EXCLUDE_DIRS = {
     ".git", ".github", "node_modules", "dist", "build", "__pycache__", ".venv", "venv",
     ".idea", ".vscode", ".pytest_cache", "target", "out",
@@ -75,6 +76,7 @@ def parse_changed_files_env(repo_root: Path, include_roots: List[Path]) -> Optio
         files.append(p)
     return files or None
 
+
 def parse_changed_files_arg(repo_root: Path, include_roots: List[Path], changed_files_csv: str) -> Optional[List[Path]]:
     if not changed_files_csv.strip():
         return None
@@ -90,6 +92,7 @@ def parse_changed_files_arg(repo_root: Path, include_roots: List[Path], changed_
             continue
         files.append(p)
     return files or None
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -154,6 +157,7 @@ def main():
     upsert_chunks(col, all_chunks, embedder=embedder, batch_size=args.batch_size)
 
     print(f"Done. include_dirs={args.include_dirs} files={len(set(touched_files))} chunks={len(all_chunks)} collection={args.collection}")
+
 
 if __name__ == "__main__":
     main()
