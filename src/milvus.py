@@ -183,11 +183,3 @@ def embed_and_search(
         exclude_file_path=exclude_file_path,
     )
 
-
-milvus_host = "127.0.0.1"
-milvus_port = "19530"
-milvus_collection = "code_chunks"
-milvus_metric = "IP"
-
-col = ensure_collection(milvus_collection, dim=768, metric=milvus_metric)
-col.load()

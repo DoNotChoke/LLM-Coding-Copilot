@@ -14,8 +14,3 @@ class Embedder:
             show_progress_bar=False,
         )
         return vecs.tolist()
-    
-
-dim = 768
-model_path = "krlvi/sentence-t5-base-nlpl-code_search_net"
-embedder = Embedder(dim=dim, model_path=model_path, normalize=True)

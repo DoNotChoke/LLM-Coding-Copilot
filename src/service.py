@@ -7,8 +7,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from embedding import embedder
-from milvus import embed_and_search, col, milvus_metric
+from embedding import Embedder
+from milvus import embed_and_search, ensure_collection
 from model import generate as gen, build_rag_context_block
 from dotenv import load_dotenv
 
@@ -16,6 +16,17 @@ load_dotenv()
 
 app = FastAPI(title="llm-coding-agent")
 
+milvus_host = "127.0.0.1"
+milvus_port = "19530"
+milvus_collection = "code_chunks"
+milvus_metric = "IP"
+dim = 768
+
+col = ensure_collection(milvus_collection, dim=dim, metric=milvus_metric)
+col.load()
+
+model_path = "krlvi/sentence-t5-base-nlpl-code_search_net"
+embedder = Embedder(dim=dim, model_path=model_path, normalize=True)
 
 class GenerateRequest(BaseModel):
     prefix: str = Field(..., description="Code before cursor (required)")
