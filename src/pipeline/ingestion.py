@@ -9,7 +9,7 @@ from uuid import uuid4
 
 from dotenv import load_dotenv
 
-from embedding import Embedder
+from pipeline.embedding import Embedder
 
 load_dotenv()
 

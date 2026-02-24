@@ -48,7 +48,7 @@ class GenerateRequest(BaseModel):
     do_sample: Optional[bool] = Field(None, description="If omitted, inferred from temperature")
     extra_stop: List[str] = Field(default_factory=list)
 
-    use_rag: bool = Field(False, description="Whether to retrieve internal code context")
+    use_rag: bool = Field(True, description="Whether to retrieve internal code context")
     rag_threshold: float = Field(0.45, ge=-1.0, le=1.0, description="Min similarity score to include chunks")
     rag_top_k: int = Field(5, ge=1, le=10, description="Max chunks to retrieve")
     repo: Optional[str] = Field(None, description="Repo filter (optional)")
@@ -92,7 +92,7 @@ async def generate(req: GenerateRequest) -> JSONResponse:
         )
 
         if hits:
-            ctx = build_rag_context_block(hits, language=(req.language or "python"))
+            ctx = build_rag_context_block(hits)
             prefix = ctx + prefix
 
     completion, finish_reason = await gen(

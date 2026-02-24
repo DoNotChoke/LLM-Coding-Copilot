@@ -7,7 +7,7 @@ from pymilvus import (
 )
 from typing import List, Dict, Optional, Any
 
-from embedding import Embedder
+from pipeline.embedding import Embedder
 
 
 class Milvus:
@@ -195,7 +195,7 @@ class Milvus:
             exclude_file_path: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         vec = embedder.embed_batch([query_text])[0]
-        return self.search_similiar_chunks(
+        return self.search_similar_chunks(
             col=col,
             query_vec=vec,
             threshold=threshold,

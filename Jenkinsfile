@@ -86,19 +86,21 @@ pipeline {
             export CHANGED_FILES="${env.CHANGED_FILES ?: ""}"
           fi
 
-          python src/pipeline/pipeline_ingest.py \\
-            --repo_root . \\
-            --include_dirs "${params.INGEST_INCLUDE_DIRS}" \\
-            --repo "${env.REPO_ID}" \\
-            --branch "\${BRANCH}" \\
-            --commit "\${HEAD}" \\
-            --milvus_host "${MILVUS_HOST}" \\
-            --milvus_port "${MILVUS_PORT}" \\
-            --collection "${params.MILVUS_COLLECTION}" \\
-            --embed_model "${params.EMBED_MODEL}" \\
-            --embed_dim "${params.EMBED_DIM}" \\
-            --batch_size "${params.BATCH_SIZE}" \\
-            \${FULL_FLAG}
+          cd src
+
+          python -m pipeline.pipeline_ingest \
+            --repo_root .. \
+            --include_dirs "${params.INGEST_INCLUDE_DIRS}" \
+            --repo "${env.REPO_ID}" \
+            --branch "${BRANCH}" \
+            --commit "${HEAD}" \
+            --milvus_host "${MILVUS_HOST}" \
+            --milvus_port "${MILVUS_PORT}" \
+            --collection "${params.MILVUS_COLLECTION}" \
+            --embed_model "${params.EMBED_MODEL}" \
+            --embed_dim "${params.EMBED_DIM}" \
+            --batch_size "${params.BATCH_SIZE}" \
+            ${FULL_FLAG}
         """
       }
     }
