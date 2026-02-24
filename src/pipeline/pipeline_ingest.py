@@ -3,9 +3,9 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Set
 
-from chunking import split_code_file
-from embedding import Embedder
-from milvus import Milvus
+from pipeline.chunking import split_code_file
+from pipeline.embedding import Embedder
+from pipeline.milvus import Milvus
 
 
 DEFAULT_EXCLUDE_DIRS = {
