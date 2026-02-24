@@ -71,7 +71,7 @@ class Milvus:
                 [x["repo"] for x in batch],
                 [x.get("branch", "") for x in batch],
                 [x["commit"] for x in batch],
-                [x["file_path"] for x in batch],
+                [str(x["file_path"]) for x in batch],
                 [x["language"] for x in batch],
                 [int(x["chunk_index"]) for x in batch],
                 [x["chunk_hash"] for x in batch],
