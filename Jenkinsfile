@@ -86,7 +86,7 @@ pipeline {
             export CHANGED_FILES="${env.CHANGED_FILES ?: ""}"
           fi
 
-          python src/pipeline_ingest.py \\
+          python src/pipeline/pipeline_ingest.py \\
             --repo_root . \\
             --include_dirs "${params.INGEST_INCLUDE_DIRS}" \\
             --repo "${env.REPO_ID}" \\

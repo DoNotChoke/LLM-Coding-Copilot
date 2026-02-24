@@ -1,32 +1,43 @@
 import argparse
 
 import uvicorn
-from typing import List, Optional
 
+from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+
+from contextlib import asynccontextmanager
 from pydantic import BaseModel, Field
 
-from embedding import Embedder
-from milvus import embed_and_search, ensure_collection
+from pipeline.embedding import Embedder
+from pipeline.milvus import Milvus
 from model import generate as gen, build_rag_context_block
 from dotenv import load_dotenv
 
 load_dotenv()
-
-app = FastAPI(title="llm-coding-agent")
 
 milvus_host = "127.0.0.1"
 milvus_port = "19530"
 milvus_collection = "code_chunks"
 milvus_metric = "IP"
 dim = 768
-
-col = ensure_collection(milvus_collection, dim=dim, metric=milvus_metric)
-col.load()
-
 model_path = "krlvi/sentence-t5-base-nlpl-code_search_net"
-embedder = Embedder(dim=dim, model_path=model_path, normalize=True)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.milvus = Milvus(host=milvus_host, port=milvus_port)
+    app.state.embedder = Embedder(dim=dim, model_path=model_path)
+    app.state.col = app.state.milvus.ensure_collection(
+        name=milvus_collection,
+        dim=dim,
+        metric=milvus_metric,
+    )
+    yield
+
+
+app = FastAPI(title="llm-coding-copilot", lifespan=lifespan)
+
 
 class GenerateRequest(BaseModel):
     prefix: str = Field(..., description="Code before cursor (required)")
@@ -37,14 +48,13 @@ class GenerateRequest(BaseModel):
     do_sample: Optional[bool] = Field(None, description="If omitted, inferred from temperature")
     extra_stop: List[str] = Field(default_factory=list)
 
-    use_rag: bool = Field(True, description="Whether to retrieve internal code context")
+    use_rag: bool = Field(False, description="Whether to retrieve internal code context")
     rag_threshold: float = Field(0.45, ge=-1.0, le=1.0, description="Min similarity score to include chunks")
     rag_top_k: int = Field(5, ge=1, le=10, description="Max chunks to retrieve")
     repo: Optional[str] = Field(None, description="Repo filter (optional)")
     branch: Optional[str] = Field(None, description="Branch filter (optional)")
     language: Optional[str] = Field(None, description="Language filter, e.g. python")
     exclude_file_path: Optional[str] = Field(None, description="Exclude current file path from retrieval")
-
 
 
 class GenerateResponse(BaseModel):
@@ -62,14 +72,17 @@ async def generate(req: GenerateRequest) -> JSONResponse:
     prefix = req.prefix
     suffix = req.suffix or ""
 
-    # ---- RAG injection (prepend to prefix) ----
+    milvus = app.state.milvus
+    col = app.state.col
+    embedder = app.state.embedder
+
     if req.use_rag:
-        # Use last N chars of prefix as query to keep it focused (optional)
-        query_text = prefix[-2000:]  # tune (avoid too long)
-        hits = embed_and_search(
+        query_text = prefix[-2000:]
+
+        hits = milvus.embed_and_search(
+            query_text=query_text,
             col=col,
             embedder=embedder,
-            query_text=query_text,
             threshold=req.rag_threshold,
             metric=milvus_metric,
             repo=req.repo,
@@ -93,9 +106,6 @@ async def generate(req: GenerateRequest) -> JSONResponse:
     )
 
     return JSONResponse({"completion": completion, "finish_reason": finish_reason})
-
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="127.0.0.1")

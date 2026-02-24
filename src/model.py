@@ -2,13 +2,12 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     StoppingCriteria,
-    StoppingCriteriaList,
+    StoppingCriteriaList
 )
 
 import torch
 
 from typing import List, Optional
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,6 +21,7 @@ MODEL_ID = "Qwen/Qwen2.5-Coder-0.5B"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 
+
 FIM_PREFIX = "<|fim_prefix|>"
 FIM_SUFFIX = "<|fim_suffix|>"
 FIM_MIDDLE = "<|fim_middle|>"
@@ -30,13 +30,6 @@ specials_to_add = []
 for tok in (FIM_PREFIX, FIM_SUFFIX, FIM_MIDDLE):
     if tokenizer.convert_tokens_to_ids(tok) == tokenizer.unk_token_id:
         specials_to_add.append(tok)
-    
-
-if specials_to_add:
-    tokenizer.add_special_tokens(
-        {"additional_special_tokens": specials_to_add},
-        replace_additional_special_tokens=False,
-    )
 
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
@@ -52,9 +45,9 @@ model = model.to(device)
 model.eval()
 
 DEFAULT_STOP_STRINGS: List[str] = [
-    "```",               # markdown fence
-    "\n\n\n",            # too many blank lines
-    "<|endoftext|>",     # end marker (some tokenizers)
+    "```",
+    "\n\n\n",
+    "<|endoftext|>",
 ]
 
 def encode_stop_strings(stop_strings: List[str]) -> List[List[int]]:
@@ -76,7 +69,7 @@ class StopOnSequences(StoppingCriteria):
     def __init__(self, stop_sequences_token_ids: List[List[int]]):
         super().__init__()
         self.stop_seqs = [seq for seq in stop_sequences_token_ids if seq]
-    
+
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
         if input_ids is None or input_ids.numel() == 0:
             return False
@@ -87,33 +80,34 @@ class StopOnSequences(StoppingCriteria):
                 return True
         return False
 
+
 def build_fim_prompt(prefix: str, suffix: str) -> str:
     prefix = prefix or ""
     suffix = suffix or ""
     return f"{FIM_PREFIX}{prefix}{FIM_SUFFIX}{suffix}{FIM_MIDDLE}"
 
 
-def build_rag_context_block(hits: List[dict], language: str = "python") -> str:
+def build_rag_context_block(hits: List[dict]) -> str:
     if not hits:
         return ""
-    
+
     items = []
     for h in hits:
         text = (h.get("text") or "").strip()
         if not text:
             continue
         items.append(text)
-    
+
     body = "\n\n".join(items).strip()
     if not body:
         return ""
 
     return (
-            '"""\n'
-            "RAG_CONTEXT (internal codebase; for reference only)\n"
-            f"{body}\n"
-            '"""\n\n'
-        )
+        '"""\n'
+        "RAG_CONTEXT (internal codebase; for reference only)\n"
+        f"{body}\n"
+        '"""\n\n'
+    )
 
 
 def strip_at_stop_strings(text: str, stop_strings: List[str]) -> str:
@@ -128,7 +122,6 @@ def strip_at_stop_strings(text: str, stop_strings: List[str]) -> str:
     if cut is not None:
         return text[:cut]
     return text
-
 
 async def generate(
         prefix: str,

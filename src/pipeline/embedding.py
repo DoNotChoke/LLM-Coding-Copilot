@@ -11,6 +11,6 @@ class Embedder:
         vecs = self.model.encode(
             texts,
             normalize_embeddings=self.normalize,
-            show_progress_bar=False,
+            show_progress_bar=True
         )
         return vecs.tolist()

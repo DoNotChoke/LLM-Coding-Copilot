@@ -1,13 +1,8 @@
---extra-index-url https://download.pytorch.org/whl/cu121
 torch
-torchvision
-torchaudio
 
-fastapi
 langchain
 langchain-text-splitters
 pymilvus
 transformers
 sentence-transformers
 datasets
-uvicorn
