@@ -7,7 +7,7 @@ from pymilvus import (
 )
 from typing import List, Dict, Optional, Any
 
-from pipeline.embedding import Embedder
+from embedding import Embedder
 
 
 class Milvus:
