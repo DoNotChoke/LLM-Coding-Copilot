@@ -51,10 +51,12 @@ class Milvus:
         col.load()
         return col
 
+
     def delete_file_chunks(self, col: Collection, repo: str, file_path: str):
         expr = f'repo == "{repo}" && file_path == "{file_path}"'
         col.delete(expr)
         col.flush()
+
 
     def upsert_chunks(self, col: Collection, chunks: List[Dict[str, Any]], embedder: Embedder, batch_size: int = 128):
         if not chunks:
@@ -81,6 +83,7 @@ class Milvus:
             col.insert(data)
 
         col.flush()
+
 
     def search_similar_chunks(
             self,
@@ -181,6 +184,7 @@ class Milvus:
         out.sort(key=lambda x: x["score"], reverse=True)
 
         return out[:5]
+
 
     def embed_and_search(
             self,

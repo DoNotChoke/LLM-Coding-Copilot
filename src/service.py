@@ -106,6 +106,8 @@ async def generate(req: GenerateRequest) -> JSONResponse:
     )
 
     return JSONResponse({"completion": completion, "finish_reason": finish_reason})
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="127.0.0.1")

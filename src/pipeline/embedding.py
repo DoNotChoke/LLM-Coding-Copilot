@@ -1,6 +1,7 @@
 from typing import List
 from sentence_transformers import SentenceTransformer
 
+
 class Embedder:
     def __init__(self, dim: int, model_path: str, normalize: bool = True):
         self.dim = dim

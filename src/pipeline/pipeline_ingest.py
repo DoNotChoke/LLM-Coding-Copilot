@@ -18,6 +18,7 @@ DEFAULT_INCLUDE_EXTS = {
     ".md", ".yaml", ".yml", ".json", ".toml",
 }
 
+
 def parse_include_dirs(repo_root: Path, include_dirs_csv: str) -> List[Path]:
     dirs = [d.strip().strip("/\\") for d in (include_dirs_csv or "").split(",") if d.strip()]
     if not dirs:

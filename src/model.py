@@ -50,6 +50,7 @@ DEFAULT_STOP_STRINGS: List[str] = [
     "<|endoftext|>",
 ]
 
+
 def encode_stop_strings(stop_strings: List[str]) -> List[List[int]]:
     encoded: List[List[int]] = []
     for s in stop_strings:
@@ -122,6 +123,7 @@ def strip_at_stop_strings(text: str, stop_strings: List[str]) -> str:
     if cut is not None:
         return text[:cut]
     return text
+
 
 async def generate(
         prefix: str,

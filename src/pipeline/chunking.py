@@ -17,11 +17,12 @@ def read_text(path: Path) -> str:
     except Exception:
         return path.read_text(encoding="latin-1", errors="ignore")
 
+
 def sha1_hex(s: str) -> str:
     return hashlib.sha1(s.encode("utf-8")).hexdigest()
 
+
 def split_code_file(repo_root: Path, file_path: Path, repo: str, commit: str):
-    rel = str(file_path.relative_to(repo_root)).replace("\\", "/")
     text = read_text(file_path)
     if not text.strip():
         return []

@@ -20,7 +20,7 @@ pipeline {
   }
 
   environment {
-    // pip cache persists because workspace is under /var/jenkins_home (volume)
+    // pip/uv cache persists because workspace is under /var/jenkins_home (volume)
     PIP_CACHE_DIR = "${WORKSPACE}/.pip-cache"
 
     REPO_ID = "${JOB_NAME}"
@@ -69,11 +69,25 @@ pipeline {
           set -euxo pipefail
 
           apt-get update
-          apt-get install -y --no-install-recommends git ca-certificates
+          apt-get install -y --no-install-recommends git ca-certificates curl
           rm -rf /var/lib/apt/lists/*
 
-          python -m pip install -U pip
-          pip install --cache-dir "${PIP_CACHE_DIR}" -r requirements.txt
+          # Install uv (fast Python package installer)
+          # Installs to ~/.local/bin by default
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+          export PATH="\$HOME/.local/bin:\$PATH"
+
+          # Optional sanity checks
+          python --version
+          uv --version
+
+          # Use uv cache dir (reuse Jenkins workspace cache)
+          export UV_CACHE_DIR="${PIP_CACHE_DIR}"
+
+          # Install dependencies from requirements-jenkins.txt
+          # (uv pip is a drop-in replacement for pip with faster resolver/downloader)
+          uv pip install --cache-dir "${PIP_CACHE_DIR}" -r requirements-jenkins.txt
 
           HEAD="\$(git rev-parse HEAD)"
           BRANCH="\${BRANCH_NAME:-\$(git rev-parse --abbrev-ref HEAD)}"
